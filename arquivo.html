@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Inteligente de Segurança</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            transition: background-color 0.3s ease;
+        }
+        nav button {
+            transition: all 0.2s ease-in-out;
+        }
+        table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+        .overflow-x-auto::-webkit-scrollbar {
+            height: 6px;
+        }
+        .overflow-x-auto::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Cabeçalho -->
+    <header class="bg-blue-900 text-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center">
+            <div class="flex items-center space-x-3 mb-2 md:mb-0">
+                <i class="fa-solid fa-shield-halved text-3xl text-yellow-400"></i>
+                <div>
+                    <h1 class="text-xl font-bold">Gestão Inteligente de Segurança</h1>
+                    <p class="text-xs text-blue-200">FATEC SENAI Ribas do Rio Pardo | Projeto MVP</p>
+                </div>
+            </div>
+            <nav class="flex flex-wrap gap-2 justify-center">
+                <button onclick="mudarAba('dashboard')" id="btn-dashboard" class="px-3 py-2 rounded bg-blue-700 ring-2 ring-white text-sm font-medium transition hover:bg-blue-700">
+                    <i class="fa-solid fa-chart-pie mr-1"></i> Painel
+                </button>
+                <button onclick="mudarAba('funcionarios')" id="btn-funcionarios" class="px-3 py-2 rounded bg-blue-900 text-sm font-medium transition hover:bg-blue-700">
+                    <i class="fa-solid fa-users mr-1"></i> Funcionários
+                </button>
+                <button onclick="mudarAba('acidentes')" id="btn-acidentes" class="px-3 py-2 rounded bg-blue-900 text-sm font-medium transition hover:bg-blue-700">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Acidentes
+                </button>
+                <button onclick="mudarAba('epis')" id="btn-epis" class="px-3 py-2 rounded bg-blue-900 text-sm font-medium transition hover:bg-blue-700">
+                    <i class="fa-solid fa-hard-hat mr-1"></i> EPIs
+                </button>
+                <button onclick="mudarAba('riscos')" id="btn-riscos" class="px-3 py-2 rounded bg-blue-900 text-sm font-medium transition hover:bg-blue-700">
+                    <i class="fa-solid fa-fire-flame-curved mr-1"></i> Riscos
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container mx-auto px-4 py-6 flex-grow">
+
+        <!-- 1. DASHBOARD -->
+        <section id="tab-dashboard" class="space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-2xl font-semibold text-blue-900 mb-2">Bem-vindo ao Sistema</h2>
+                <p class="text-gray-600">Sistema centralizado para controle de segurança do trabalho, prevenção de acidentes e gestão de EPIs. Executando 100% no navegador via LocalStorage.</p>
+            </div>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Funcionários</p>
+                        <h3 id="count-funcionarios" class="text-2xl font-bold text-blue-900">0</h3>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-full"><i class="fa-solid fa-users text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Acidentes Registrados</p>
+                        <h3 id="count-acidentes" class="text-2xl font-bold text-red-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-red-50 text-red-600 rounded-full"><i class="fa-solid fa-triangle-exclamation text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">EPIs Atribuídos</p>
+                        <h3 id="count-epis" class="text-2xl font-bold text-green-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-green-50 text-green-600 rounded-full"><i class="fa-solid fa-hard-hat text-xl"></i></div>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-500 font-medium">Riscos Mapeados</p>
+                        <h3 id="count-riscos" class="text-2xl font-bold text-amber-600">0</h3>
+                    </div>
+                    <div class="p-3 bg-amber-50 text-amber-600 rounded-full"><i class="fa-solid fa-fire-flame-curved text-xl"></i></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. FUNCIONÁRIOS -->
+        <section id="tab-funcionarios" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-xl font-semibold text-blue-900 mb-4"><i class="fa-solid fa-user-plus mr-2"></i>Cadastrar Novo Funcionário</h2>
+                <form id="form-funcionario" onsubmit="adicionarFuncionario(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
+                        <input type="text" id="func-nome" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Cargo / Função</label>
+                        <input type="text" id="func-cargo" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="w-full bg-blue-900 text-white font-medium py-2 px-4 rounded text-sm hover:bg-blue-800 transition">Cadastrar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-700">Lista de Funcionários Registrados</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
+                                <th class="p-3">Nome</th>
+                                <th class="p-3">Cargo</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-funcionarios" class="text-sm divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ACIDENTES -->
+        <section id="tab-acidentes" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-xl font-semibold text-blue-900 mb-4"><i class="fa-solid fa-triangle-exclamation mr-2"></i>Registrar Acidente de Trabalho</h2>
+                <form id="form-acidente" onsubmit="adicionarAcidente(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Funcionário Envolvido</label>
+                        <select id="acid-func" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione um funcionário...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Data do Ocorrido</label>
+                        <input type="date" id="acid-data" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descrição do Acidente / Causa</label>
+                        <textarea id="acid-desc" rows="3" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Descreva detalhadamente o acontecido..."></textarea>
+                    </div>
+                    <div class="md:col-span-2">
+                        <button type="submit" class="bg-red-600 text-white font-medium py-2 px-6 rounded text-sm hover:bg-red-700 transition">Registrar Acidente</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-700">Histórico de Acidentes Registrados</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
+                                <th class="p-3">Data</th>
+                                <th class="p-3">Funcionário</th>
+                                <th class="p-3">Descrição</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-acidentes" class="text-sm divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. EPIS -->
+        <section id="tab-epis" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-xl font-semibold text-blue-900 mb-4"><i class="fa-solid fa-hard-hat mr-2"></i>Controle e Entrega de EPI</h2>
+                <form id="form-epi" onsubmit="adicionarEpi(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Funcionário</label>
+                        <select id="epi-func" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Selecione...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Equipamento (EPI)</label>
+                        <input type="text" id="epi-nome" placeholder="Ex: Capacete, Óculos" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Validade</label>
+                        <input type="date" id="epi-validade" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-3">
+                        <button type="submit" class="bg-blue-900 text-white font-medium py-2 px-6 rounded text-sm hover:bg-blue-800 transition">Registrar Entrega de EPI</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-700">EPIs Atribuídos e Validades</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
+                                <th class="p-3">Funcionário</th>
+                                <th class="p-3">EPI</th>
+                                <th class="p-3">Validade</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-epis" class="text-sm divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. RISCOS -->
+        <section id="tab-riscos" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <h2 class="text-xl font-semibold text-blue-900 mb-4"><i class="fa-solid fa-fire-flame-curved mr-2"></i>Identificação de Riscos no Ambiente</h2>
+                <form id="form-risco" onsubmit="adicionarRisco(event)" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Setor / Local</label>
+                        <input type="text" id="risco-local" placeholder="Ex: Produção, Armazém" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Risco</label>
+                        <select id="risco-tipo" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Físico">Físico</option>
+                            <option value="Químico">Químico</option>
+                            <option value="Biológico">Biológico</option>
+                            <option value="Ergonômico">Ergonômico</option>
+                            <option value="Acidente">Mecânico / Acidente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nível de Severidade</label>
+                        <select id="risco-nivel" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="Baixo">Baixo</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Alto">Alto</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Descrição Detalhada</label>
+                        <input type="text" id="risco-desc" placeholder="Breve descrição do perigo" required class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="md:col-span-3">
+                        <button type="submit" class="bg-amber-600 text-white font-medium py-2 px-6 rounded text-sm hover:bg-amber-700 transition">Registrar Risco</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b border-gray-100">
+                    <h3 class="font-semibold text-gray-700">Riscos Ambientais Mapeados</h3>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
+                                <th class="p-3">Local</th>
+                                <th class="p-3">Tipo</th>
+                                <th class="p-3">Severidade</th>
+                                <th class="p-3">Descrição</th>
+                                <th class="p-3 text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-riscos" class="text-sm divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Rodapé com Créditos -->
+    <footer class="bg-white border-t border-gray-200 py-4 text-center text-xs text-gray-500 space-y-1">
+        <p>Gestão Inteligente de Segurança &copy; 2026 - FATEC SENAI Ribas do Rio Pardo</p>
+        <p class="font-medium text-blue-900">Desenvolvido por Marcos Augusto Barbosa Junior | Curso: Lógica de Programação</p>
+    </footer>
+
+    <!-- Lógica de Negócio Integrada -->
+    <script>
+        function mudarAba(abaId) {
+            const abas = ['dashboard', 'funcionarios', 'acidentes', 'epis', 'riscos'];
+            abas.forEach(aba => {
+                document.getElementById(`tab-${aba}`).classList.add('hidden');
+                document.getElementById(`btn-${aba}`).classList.remove('bg-blue-700', 'ring-2', 'ring-white');
+                document.getElementById(`btn-${aba}`).classList.add('bg-blue-900');
+            });
+            document.getElementById(`tab-${abaId}`).classList.remove('hidden');
+            document.getElementById(`btn-${abaId}`).classList.remove('bg-blue-900');
+            document.getElementById(`btn-${abaId}`).classList.add('bg-blue-700', 'ring-2', 'ring-white');
+            atualizarInterface();
+        }
+
+        let db = {
+            funcionarios: JSON.parse(localStorage.getItem('gis_funcionarios')) || [],
+            acidentes: JSON.parse(localStorage.getItem('gis_acidentes')) || [],
+            epis: JSON.parse(localStorage.getItem('gis_epis')) || [],
+            riscos: JSON.parse(localStorage.getItem('gis_riscos')) || []
+        };
+
+        function salvarDados() {
+            localStorage.setItem('gis_funcionarios', JSON.stringify(db.funcionarios));
+            localStorage.setItem('gis_acidentes', JSON.stringify(db.acidentes));
+            localStorage.setItem('gis_epis', JSON.stringify(db.epis));
+            localStorage.setItem('gis_riscos', JSON.stringify(db.riscos));
+        }
+
+        function adicionarFuncionario(e) {
+            e.preventDefault();
+            const nome = document.getElementById('func-nome').value;
+            const cargo = document.getElementById('func-cargo').value;
+            db.funcionarios.push({ id: Date.now(), nome, cargo });
+            salvarDados();
+            document.getElementById('form-funcionario').reset();
+            atualizarInterface();
+        }
+
+        function removerFuncionario(id) {
+            db.funcionarios = db.funcionarios.filter(f => f.id !== id);
+            salvarDados();
+            atualizarInterface();
+        }
+
+        function adicionarAcidente(e) {
+            e.preventDefault();
+            const funcId = document.getElementById('acid-func').value;
+            const data = document.getElementById('acid-data').value;
+            const desc = document.getElementById('acid-desc').value;
+            const funcObj = db.funcionarios.find(f => f.id == funcId);
+            db.acidentes.push({ id: Date.now(), funcionario: funcObj ? funcObj.nome : 'Desconhecido', data, desc });
+            salvarDados();
+            document.getElementById('form-acidente').reset();
+            atualizarInterface();
+        }
+
+        function removerAcidente(id) {
+            db.acidentes = db.acidentes.filter(a => a.id !== id);
+            salvarDados();
+            atualizarInterface();
+        }
+
+        function adicionarEpi(e) {
+            e.preventDefault();
+            const funcId = document.getElementById('epi-func').value;
+            const nome = document.getElementById('epi-nome').value;
+            const validade = document.getElementById('epi-validade').value;
+            const funcObj = db.funcionarios.find(f => f.id == funcId);
+            db.epis.push({ id: Date.now(), funcionario: funcObj ? funcObj.nome : 'Desconhecido', nome, validade });
+            salvarDados();
+            document.getElementById('form-epi').reset();
+            atualizarInterface();
+        }
+
+        function removerEpi(id) {
+            db.epis = db.epis.filter(e => e.id !== id);
+            salvarDados();
+            atualizarInterface();
+        }
+
+        function adicionarRisco(e) {
+            e.preventDefault();
+            const local = document.getElementById('risco-local').value;
+            const tipo = document.getElementById('risco-tipo').value;
+            const nivel = document.getElementById('risco-nivel').value;
+            const desc = document.getElementById('risco-desc').value;
+            db.riscos.push({ id: Date.now(), local, tipo, nivel, desc });
+            salvarDados();
+            document.getElementById('form-risco').reset();
+            atualizarInterface();
+        }
+
+        function removerRisco(id) {
+            db.riscos = db.riscos.filter(r => r.id !== id);
+            salvarDados();
+            atualizarInterface();
+        }
+
+        function atualizarInterface() {
+            document.getElementById('count-funcionarios').innerText = db.funcionarios.length;
+            document.getElementById('count-acidentes').innerText = db.acidentes.length;
+            document.getElementById('count-epis').innerText = db.epis.length;
+            document.getElementById('count-riscos').innerText = db.riscos.length;
+
+            const selectsFunc = [document.getElementById('acid-func'), document.getElementById('epi-func')];
+            selectsFunc.forEach(select => {
+                if(!select) return;
+                select.innerHTML = '<option value="">Selecione um funcionário...</option>';
+                db.funcionarios.forEach(f => {
+                    select.innerHTML += `<option value="${f.id}">${f.nome} (${f.cargo})</option>`;
+                });
+            });
+
+            const tFunc = document.getElementById('tabela-funcionarios');
+            tFunc.innerHTML = db.funcionarios.length === 0 ? '<tr><td colspan="3" class="p-4 text-center text-gray-400">Nenhum registro.</td></tr>' : '';
+            db.funcionarios.forEach(f => {
+                tFunc.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-medium text-gray-800">${f.nome}</td><td class="p-3 text-gray-600">${f.cargo}</td><td class="p-3 text-center"><button onclick="removerFuncionario(${f.id})" class="text-red-500 hover:text-red-700 text-xs bg-red-50 px-2 py-1 rounded">Excluir</button></td></tr>`;
+            });
+
+            const tAcid = document.getElementById('tabela-acidentes');
+            tAcid.innerHTML = db.acidentes.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">Nenhum registro.</td></tr>' : '';
+            db.acidentes.forEach(a => {
+                tAcid.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 text-gray-600">${a.data}</td><td class="p-3 font-medium text-gray-800">${a.funcionario}</td><td class="p-3 text-gray-600">${a.desc}</td><td class="p-3 text-center"><button onclick="removerAcidente(${a.id})" class="text-red-500 hover:text-red-700 text-xs bg-red-50 px-2 py-1 rounded">Excluir</button></td></tr>`;
+            });
+
+            const tEpi = document.getElementById('tabela-epis');
+            tEpi.innerHTML = db.epis.length === 0 ? '<tr><td colspan="4" class="p-4 text-center text-gray-400">Nenhum registro.</td></tr>' : '';
+            db.epis.forEach(ep => {
+                tEpi.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-medium text-gray-800">${ep.funcionario}</td><td class="p-3 text-gray-600">${ep.nome}</td><td class="p-3 text-gray-600">${ep.validade}</td><td class="p-3 text-center"><button onclick="removerEpi(${ep.id})" class="text-red-500 hover:text-red-700 text-xs bg-red-50 px-2 py-1 rounded">Excluir</button></td></tr>`;
+            });
+
+            const tRisco = document.getElementById('tabela-riscos');
+            tRisco.innerHTML = db.riscos.length === 0 ? '<tr><td colspan="5" class="p-4 text-center text-gray-400">Nenhum registro.</td></tr>' : '';
+            db.riscos.forEach(r => {
+                let badgeColor = r.nivel === 'Alto' ? 'bg-red-100 text-red-700' : (r.nivel === 'Médio' ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700');
+                tRisco.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-medium text-gray-800">${r.local}</td><td class="p-3 text-gray-600">${r.tipo}</td><td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-semibold ${badgeColor}">${r.nivel}</span></td><td class="p-3 text-gray-600">${r.desc}</td><td class="p-3 text-center"><button onclick="removerRisco(${r.id})" class="text-red-500 hover:text-red-700 text-xs bg-red-50 px-2 py-1 rounded">Excluir</button></td></tr>`;
+            });
+        }
+
+        window.onload = atualizarInterface;
+    </script>
+</body>
+</html>
